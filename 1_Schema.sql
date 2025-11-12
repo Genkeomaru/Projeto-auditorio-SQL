@@ -30,7 +30,7 @@ Table Curso {
 Table Faculdade {
   id_Unidade int [pk]
   Nome text
-  CNPJ varchar
+  CNPJ char(14)
   Endereço varchar
   Cidade varchar
   Estado varchar
@@ -39,9 +39,15 @@ Table Faculdade {
 Table Materias {
   id_materia int [pk]
   Nome text
-  Sala int
-  id_professor int
   id_Curso int
+}
+
+Table Turma {
+  id_Turma int [pk]
+  id_materia int
+  id_professor int
+  Ano_semestre varchar
+  Sala varchar
 }
 
 Table Professores {
@@ -61,7 +67,7 @@ Table Professores {
 }
 
 Table Nota {
-  id_materia int
+  id_Turma int
   id_Matricula int
   Nota decimal (10)
 }
@@ -83,13 +89,17 @@ Ref {
 }
 
 Ref {
-  Professores.id_Professor > Materias.id_professor
-}
-
-Ref {
-  Materias.id_materia > Nota.id_materia
+  Turma.id_Turma > Nota.id_Turma
 }
 
 Ref {
   Matricula.id_Matricula > Nota.id_Matricula
+}
+
+Ref {
+  Materias.id_materia > Turma.id_materia
+}
+
+Ref {
+  Professores.id_Professor > Turma.id_professor
 }
