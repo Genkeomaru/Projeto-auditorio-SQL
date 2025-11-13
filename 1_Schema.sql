@@ -1,105 +1,89 @@
-Table Aluno {
-  id_Aluno int [pk]
-  Nome_completo text
-  Data_de_Nascimento date
-  RG char(20)
-  CPF char(11)
-  Telefone char(11)
-  Email varchar
-  CEP varchar
-  Endereço varchar
-  Cidade varchar
-  Estado varchar
-}
+-- 1. Tabela Faculdade (Não depende de ninguém)
+CREATE TABLE Faculdade (
+    id_Unidade INT PRIMARY KEY,
+    Nome VARCHAR(255),
+    CNPJ CHAR(14),
+    Endereco VARCHAR(255),
+    Cidade VARCHAR(100),
+    Estado CHAR(2)
+);
 
-Table Matricula {
-  id_Matricula int [pk]
-  id_Aluno int
-  id_Curso int
-  Data_Matricula date
-}
+-- 2. Tabela Professores (Não depende de ninguém)
+CREATE TABLE Professores (
+    id_Professor INT PRIMARY KEY,
+    Nome_completo VARCHAR(255),
+    Data_de_Nascimento DATE,
+    Telefone CHAR(11),
+    Email VARCHAR(255),
+    RG CHAR(20),
+    CPF CHAR(11),
+    Tipo_de_Aula INT,
+    Formacao INT,
+    CEP VARCHAR(10),
+    Endereco VARCHAR(255),
+    Cidade VARCHAR(100),
+    Estado CHAR(2)
+);
 
-Table Curso {
-  id_Curso int [pk]
-  Nome text
-  Carga_horaria int
-  Previsão_de_Conclusão int
-  id_Unidade int
-}
+-- 3. Tabela Aluno (Não depende de ninguém)
+CREATE TABLE Aluno (
+    id_Aluno INT PRIMARY KEY,
+    Nome_completo VARCHAR(255),
+    Data_de_Nascimento DATE,
+    RG CHAR(20),
+    CPF CHAR(11),
+    Telefone CHAR(11),
+    Email VARCHAR(255),
+    CEP VARCHAR(10),
+    Endereco VARCHAR(255),
+    Cidade VARCHAR(100),
+    Estado CHAR(2)
+);
 
-Table Faculdade {
-  id_Unidade int [pk]
-  Nome text
-  CNPJ char(14)
-  Endereço varchar
-  Cidade varchar
-  Estado varchar
-}
+-- 4. Tabela Curso (Depende da Faculdade)
+CREATE TABLE Curso (
+    id_Curso INT PRIMARY KEY,
+    Nome VARCHAR(255),
+    Carga_horaria INT,
+    Previsao_de_Conclusao INT,
+    id_Unidade INT,
+    FOREIGN KEY (id_Unidade) REFERENCES Faculdade(id_Unidade)
+);
 
-Table Materias {
-  id_materia int [pk]
-  Nome text
-  id_Curso int
-}
+-- 5. Tabela Materias (Depende do Curso)
+CREATE TABLE Materias (
+    id_materia INT PRIMARY KEY,
+    Nome VARCHAR(255),
+    id_Curso INT,
+    FOREIGN KEY (id_Curso) REFERENCES Curso(id_Curso)
+);
 
-Table Turma {
-  id_Turma int [pk]
-  id_materia int
-  id_professor int
-  Ano_semestre varchar
-  Sala varchar
-}
+-- 6. Tabela Turma (Depende de Materia e Professor)
+CREATE TABLE Turma (
+    id_Turma INT PRIMARY KEY,
+    id_materia INT,
+    id_professor INT,
+    Ano_semestre VARCHAR(10),
+    Sala VARCHAR(20),
+    FOREIGN KEY (id_materia) REFERENCES Materias(id_materia),
+    FOREIGN KEY (id_professor) REFERENCES Professores(id_Professor)
+);
 
-Table Professores {
-  id_Professor int [pk]
-  Nome_completo text
-  Data_de_Nascimento date
-  Telefone char(11)
-  Email varchar
-  RG char(20)
-  CPF char(11)
-  Tipo_de_Aula int
-  Formação int
-  CEP varchar
-  Endereço varchar
-  Cidade varchar
-  Estado varchar
-}
+-- 7. Tabela Matricula (Liga Aluno e Curso)
+CREATE TABLE Matricula (
+    id_Matricula INT PRIMARY KEY,
+    id_Aluno INT,
+    id_Curso INT,
+    Data_Matricula DATE,
+    FOREIGN KEY (id_Aluno) REFERENCES Aluno(id_Aluno),
+    FOREIGN KEY (id_Curso) REFERENCES Curso(id_Curso)
+);
 
-Table Nota {
-  id_Turma int
-  id_Matricula int
-  Nota decimal (10)
-}
-
-Ref {
-  Aluno.id_Aluno > Matricula.id_Aluno
-}
-
-Ref {
-  Curso.id_Curso > Matricula.id_Curso
-}
-
-Ref {
-  Faculdade.id_Unidade > Curso.id_Unidade
-}
-
-Ref {
-  Curso.id_Curso > Materias.id_Curso
-}
-
-Ref {
-  Turma.id_Turma > Nota.id_Turma
-}
-
-Ref {
-  Matricula.id_Matricula > Nota.id_Matricula
-}
-
-Ref {
-  Materias.id_materia > Turma.id_materia
-}
-
-Ref {
-  Professores.id_Professor > Turma.id_professor
-}
+-- 8. Tabela Nota (Depende da Turma e da Matricula)
+CREATE TABLE Nota (
+    id_Turma INT,
+    id_Matricula INT,
+    Nota DECIMAL(5,2), -- Ex: 10.00
+    FOREIGN KEY (id_Turma) REFERENCES Turma(id_Turma),
+    FOREIGN KEY (id_Matricula) REFERENCES Matricula(id_Matricula)
+);
